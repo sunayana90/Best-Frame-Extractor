@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Best Frame Extractor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>🎥 Best Frame Extractor</h1>
+    <p>Upload a video and get the best captured frame</p>
+
+    <input type="file" id="videoInput" accept="video/*">
+    <video id="preview" controls></video>
+
+    <button onclick="uploadVideo()">Extract Best Frame</button>
+
+    <div id="loading">Processing… ⏳</div>
+
+    <div id="result">
+        <h3>Best Frame</h3>
+        <img id="outputImage">
+    </div>
+</div>
+
+<script>
+function uploadVideo() {
+    const input = document.getElementById("videoInput");
+    if (!input.files.length) {
+        alert("Select a video first");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", input.files[0]);
+
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("result").style.display = "none";
+
+    fetch("/upload-video/", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("loading").style.display = "none";
+        if (data.success) {
+            document.getElementById("outputImage").src = "/result?" + Date.now();
+            document.getElementById("result").style.display = "block";
+        }
+    });
+}
+
+document.getElementById("videoInput").addEventListener("change", e => {
+    document.getElementById("preview").src =
+        URL.createObjectURL(e.target.files[0]);
+});
+</script>
+
+</body>
+</html>
